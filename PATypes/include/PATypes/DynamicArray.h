@@ -29,6 +29,7 @@ namespace PATypes {
 
     private:
 		class Enumerator : public IEnumerator<T> {
+            bool isFirst = true;
 		public:
 			Enumerator(DynamicArray<T> &parent) : parent(parent), ptr(parent.items) {}
 			Enumerator(DynamicArray<T> &parent, T *ptr) : parent(parent), ptr(ptr) {}
@@ -38,7 +39,11 @@ namespace PATypes {
 				if (ptr - parent.items >= parent.getSize() - 1 || (ptr - parent.items) < 0) {
 					return 0;
 				}
-				ptr++;
+                if(isFirst) {
+                    isFirst = false;
+                } else {
+                    ++ptr;
+                }
 				return 1;
 			}
 
@@ -47,6 +52,7 @@ namespace PATypes {
 			}
 
 			virtual void reset() {
+                isFirst = true;
 				ptr = parent.items;
 			}
 

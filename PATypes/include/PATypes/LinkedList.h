@@ -44,6 +44,7 @@ namespace PATypes {
 
     private:
 		class Enumerator : public IEnumerator<T> {
+            bool isFirst = true;
 		public:
 			Enumerator(LinkedList<T> &parent) : parent(parent), ptr(parent.head) {}
 			Enumerator(LinkedList<T> &parent, LinkedListNode<T> *ptr) : parent(parent), ptr(ptr) {}
@@ -53,7 +54,11 @@ namespace PATypes {
 				if (ptr->getNext() == nullptr) {
 					return 0;
 				}
-				ptr = ptr->getNext();
+                if(isFirst) {
+                    isFirst = false;
+                } else {
+                    ptr = ptr->getNext();
+                }
 				return 1;
 			}
 
@@ -62,6 +67,7 @@ namespace PATypes {
 			}
 
 			virtual void reset() {
+                isFirst = true;
 				ptr = parent.head;
 			}
 
