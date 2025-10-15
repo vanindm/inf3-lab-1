@@ -30,6 +30,9 @@ namespace PATypes {
 		void map(T (*f)(T)) {
 			tree.map(f);
 		}
+		T getByItem(T item) {
+			return (tree.findElement(item))->getVal();
+		}
 		bool contains(T item) {
 			return tree.findElement(item) != nullptr;
 		}
