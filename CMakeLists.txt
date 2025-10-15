@@ -23,6 +23,7 @@ target_include_directories(streamTestExec		PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(performanceTestExec			PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(PATypes)
+
 target_link_libraries(lazySequenceTestExec  PATypes)
 target_link_libraries(streamTestExec    PATypes)
 target_link_libraries(performanceTestExec	PATypes)
