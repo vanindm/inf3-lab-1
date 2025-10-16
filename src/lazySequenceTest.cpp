@@ -23,5 +23,11 @@ int main() {
 	assert(b.Get(2) == 1);
 	assert(b.Get(3) == 2);
 	assert(b.Get(8) == 21);
+
+	PATypes::LazySequence<int> *concat = a.Concat(b);
+	assert(concat->Get(4) == 5);
+	assert(concat->Get(5) == 0);
+	assert(concat->Get(13) == 21);
+	delete concat;
 	return 0;
 }

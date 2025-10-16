@@ -154,8 +154,7 @@ namespace PATypes {
 	};
 
 	template<class T>
-	BinaryTreeNode<T>::BinaryTreeNode(const BinaryTreeNode<T> &node) {
-		val = node.val;
+	BinaryTreeNode<T>::BinaryTreeNode(const BinaryTreeNode<T> &node) : val(node.val) {
 		priority = node.priority;
 		if (node.l != nullptr) {
 			this->l = new BinaryTreeNode<T>(*node.getLeft());

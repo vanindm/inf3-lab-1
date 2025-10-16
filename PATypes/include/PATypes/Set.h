@@ -10,8 +10,8 @@ namespace PATypes {
 		BinaryTree<T> tree;
 	public:
 		Set() : tree() {}
-		Set(BinaryTree<T> &tree) : tree(tree) {}
-		Set(Set<T> &set) : tree(set.tree) {}
+		Set(const BinaryTree<T> &tree) : tree(tree) {}
+		Set(const Set<T> &set) : tree(set.tree) {}
 		//Set(Sequence<T> *sequence) : tree() {
 		//}
 		Set(bool (*f)(T), Set<T> &set) {
