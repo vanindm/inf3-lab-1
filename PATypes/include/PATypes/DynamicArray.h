@@ -68,9 +68,9 @@ namespace PATypes {
 
 template<class T>
 PATypes::DynamicArray<T>::DynamicArray(T *items, int count) : size(count) {
-    this->items = new T[count];
-    for (int i = 0; i < size; ++i) {
-        this->items[i] = T(items[i]);
+    this->items = new T[this->size];
+    for (int i = 0; i < this->size; ++i) {
+        this->items[i] = (items[i]);
     }
 }
 

@@ -10,6 +10,7 @@ namespace PATypes {
 		BinaryTree<T> tree;
 	public:
 		Set() : tree() {}
+		~Set() {}
 		Set(const BinaryTree<T> &tree) : tree(tree) {}
 		Set(const Set<T> &set) : tree(set.tree) {}
 		//Set(Sequence<T> *sequence) : tree() {
@@ -32,6 +33,9 @@ namespace PATypes {
 		}
 		T getByItem(T item) {
 			return (tree.findElement(item))->getVal();
+		}
+		BinaryTreeNode<T>* getNodeByItem(T item) {
+			return (tree.findElement(item));
 		}
 		bool contains(T item) {
 			return tree.findElement(item) != nullptr;
@@ -74,6 +78,10 @@ namespace PATypes {
 				result &= contains(element);
 			}
 			return result;
+		}
+		Set<T>& operator=(const Set<T>& other) {
+			this->tree = other.tree;
+			return *this;
 		}
 	};
 

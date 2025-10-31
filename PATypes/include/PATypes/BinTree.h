@@ -151,6 +151,11 @@ namespace PATypes {
 		void threadLKP() {_threadLKP(root, nullptr, nullptr);}
 		void threadPKL() {_threadPKL(root, nullptr, nullptr);}
 		void threadPLK() {_threadPLK(root, nullptr, nullptr);}
+
+		BinaryTree& operator=(const BinaryTree& other) {
+			this->root = new BinaryTreeNode<T>(*other.root);
+			return *this;
+		}
 	};
 
 	template<class T>

@@ -29,5 +29,9 @@ int main() {
 	assert(concat->Get(5) == 0);
 	assert(concat->Get(13) == 21);
 	delete concat;
+
+	PATypes::LazySequence<int> *prepend = a.Prepend(1337);
+	assert(prepend->Get(-1) == 1337);
+	delete prepend;
 	return 0;
 }

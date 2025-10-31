@@ -58,7 +58,7 @@ namespace PATypes {
 				return index == b.index;
 			}
 		};
-		T (*rule)(Sequence<T>*) = nullptr;
+		std::function<T(Sequence<T>*)> rule;
 		// На самом деле словарь (map)
 		Set<LazyStorage> storage;
 
@@ -89,17 +89,28 @@ namespace PATypes {
 				return newValue;
 			}
 		}
-	public:
-		LazySequence() : storage(), leftmost_index(0), rightmost_index(0) {
+
+		void _Append(T item) {
+			++rightmost_index;
+			storage.insert({rightmost_index, item});
 		}
 
-		LazySequence(T* items, int count) : storage(), leftmost_index(0), rightmost_index(count - 1) {
+		void _Prepend(T item) {
+			--leftmost_index;
+			storage.insert({leftmost_index, item});
+		}
+
+	public:
+		LazySequence() : rule(nullptr), storage(), leftmost_index(0), rightmost_index(0) {
+		}
+
+		LazySequence(T* items, int count) : rule(nullptr), storage(), leftmost_index(0), rightmost_index(count - 1) {
 			for (int i = 0; i < count; ++i) {
 				storage.insert({i, items[i]});
 			}
 		}
 
-		LazySequence(Sequence<T>* seq) : rightmost_index(seq->getLength()), leftmost_index(0) {
+		LazySequence(Sequence<T>* seq) : rule(nullptr), rightmost_index(seq->getLength() - 1), leftmost_index(0) {
 			auto *enumerator = seq->getEnumerator();
 			int i = 0;
 			while(enumerator->moveNext()) {
@@ -118,7 +129,7 @@ namespace PATypes {
 			}
 			delete enumerator;
 		}
-		LazySequence(const LazySequence<T>& copy) : storage(copy.storage), IsInfinite(copy.IsInfinite), rule(copy.rule), stride(copy.stride), leftmost_index(copy.leftmost_index), rightmost_index(copy.rightmost_index) {
+		LazySequence(const LazySequence<T>& copy) : storage(copy.storage), rule(copy.rule), IsInfinite(copy.IsInfinite),  stride(copy.stride), leftmost_index(copy.leftmost_index), rightmost_index(copy.rightmost_index) {
 		}
 		T GetFirst() {
 			return storage.getByItem({leftmost_index, 0}).getValue();
@@ -145,17 +156,23 @@ namespace PATypes {
 			return storage.GetLength();
 		}
 
-		LazySequence<T>* Append(T item) {
-			++rightmost_index;
-			storage.insert({rightmost_index, item});
+		LazySequence<T>* Append(T item) const {
+			LazySequence<T>* newSeq = new LazySequence<T>(*this);
+			++(newSeq->rightmost_index);
+			newSeq->storage.insert({newSeq->rightmost_index, item});
+			return newSeq;
 		}
-		LazySequence<T>* Prepend(T item) {
-			--leftmost_index;
-			storage.insert({leftmost_index, item});
+		LazySequence<T>* Prepend(T item) const {
+			LazySequence<T>* newSeq = new LazySequence<T>(*this);
+			--(newSeq->leftmost_index);
+			newSeq->storage.insert({newSeq->leftmost_index, item});
+			return newSeq;
 		}
-		LazySequence<T>* InsertAt(T item, int index) {
-			_clearStorage(index);
-			storage.insert({index, item});
+		LazySequence<T>* InsertAt(T item, int index) const {
+			LazySequence<T>* newSeq = new LazySequence<T>(*this);
+			newSeq->_clearStorage(index);
+			newSeq->storage.insert({index, item});
+			return newSeq;
 		}
 		LazySequence<T>* Concat(LazySequence<T> &list) {
 			LazySequence<T>* newSequence;
@@ -168,11 +185,11 @@ namespace PATypes {
 				newSequence->IsInfinite = list.IsInfinite;
 				if (list.IsInfinite) {
 					for (int i = list.leftmost_index; i < list.leftmost_index + list.stride; ++i) {
-						newSequence->Append(list.Get(i));
+						newSequence->_Append(list.Get(i));
 					}
 				} else {
 					for (int i = list.leftmost_index; i < list.rightmost_index; ++i) {
-						newSequence->Append(list.Get(i));
+						newSequence->_Append(list.Get(i));
 					}
 
 				}
@@ -180,14 +197,44 @@ namespace PATypes {
 			return newSequence;
 		}
 
-		template<class T2>
-		LazySequence<T2>* Map(T2 (*)(T));
+		LazySequence<T>* Map(T (*func)(T)) {
+			LazySequence<T>* seq;
+			if (IsInfinite) {
+				std::function<T(Sequence<T>*)> newRule = [&](Sequence<T>* in){return func(rule(in));};
+				seq = new LazySequence<T>(*this);
+				seq->storage = Set<LazyStorage>();
+				for (int i = leftmost_index; i <= leftmost_index + stride; ++i) {
+					seq->storage.insert({i, func(storage.getByItem({i, T(0)}))});
+				}
+			} else {
+				seq = new LazySequence<T>(this);
+				for (int i = leftmost_index; i <= rightmost_index; ++i) {
+					seq->storage.insert({i, func(storage.getByItem({i, T(0)}))});
+				}
+			}
+			return seq;
+		}
 
 		template<class T2>
-		T2 Reduce(T2 (*)(T2, T));
+		T2 Reduce(T2 (*func)(T2, T), T2 C) {
+			if (IsInfinite) 
+				throw std::logic_error("unable to reduce infinite sequence");
+			T2 res = func(C, Get(leftmost_index));
+			for (int i = leftmost_index + 1; i <= rightmost_index; ++i) {
+				res = func(res, Get(i));
+			}
+			
+			return res;
+		}
 
-		LazySequence<T>* Where(bool (*)(T));
-
-		LazySequence<T>* Zip(Sequence<T>* seq);
+		LazySequence<T>& operator= (const LazySequence<T>& other) {
+			this->storage = other.storage;
+			this->rule = other.rule;
+			this->IsInfinite = other.IsInfinite;
+			this->stride = other.stride;
+			this->leftmost_index = other.leftmost_index;
+			this->rightmost_index = other.rightmost_index;
+			return *this;
+		}
 	};
 }
