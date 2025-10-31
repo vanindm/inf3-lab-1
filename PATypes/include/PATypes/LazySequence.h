@@ -125,8 +125,8 @@ template <class T> class LazySequence {
     }
 
     LazySequence(T (*rule)(Sequence<T> *), Sequence<T> *initial, size_t count)
-        : rule(rule), stride(count), leftmost_index(0), rightmost_index(0),
-          IsInfinite(true) {
+        : rule(rule), IsInfinite(true), stride(count), leftmost_index(0),
+          rightmost_index(0) {
         auto *enumerator = initial->getEnumerator();
         int i = 0;
         while (enumerator->moveNext()) {
@@ -136,7 +136,7 @@ template <class T> class LazySequence {
         delete enumerator;
     }
     LazySequence(const LazySequence<T> &copy)
-        : storage(copy.storage), rule(copy.rule), IsInfinite(copy.IsInfinite),
+        : rule(copy.rule), storage(copy.storage), IsInfinite(copy.IsInfinite),
           stride(copy.stride), leftmost_index(copy.leftmost_index),
           rightmost_index(copy.rightmost_index) {}
     T GetFirst() { return storage.getByItem({leftmost_index, 0}).getValue(); }
