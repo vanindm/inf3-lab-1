@@ -18,11 +18,13 @@ add_executable(lazySequenceTestExec     src/lazySequenceTest.cpp)
 add_executable(streamTestExec    src/streamTest.cpp)
 add_executable(performanceTestExec	src/performanceTest.cpp)
 add_executable(turingMachineTestExec	src/turingMachineTest.cpp)
+add_executable(turingMachineVigenereExec	src/turingMachineVigenere.cpp)
 
 target_include_directories(lazySequenceTestExec			PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(streamTestExec		PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(performanceTestExec			PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(turingMachineTestExec	PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(turingMachineVigenereExec	PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(PATypes)
 
@@ -30,6 +32,7 @@ target_link_libraries(lazySequenceTestExec  PATypes)
 target_link_libraries(streamTestExec    PATypes)
 target_link_libraries(performanceTestExec	PATypes)
 target_link_libraries(turingMachineTestExec	PATypes)
+target_link_libraries(turingMachineVigenereExec	PATypes)
 
 enable_testing()
 

@@ -48,6 +48,7 @@ template <class T> class LazySequence {
     class LazyStorage {
         int index;
         T val;
+        friend LazySequence;
 
       public:
         LazyStorage(int index, T val) : index(index), val(val) {}
@@ -66,10 +67,10 @@ template <class T> class LazySequence {
     int leftmost_index;
     int rightmost_index;
     void _clearStorage(int index) {
-        std::function<bool(T)> clearFunction = [index](const T &a) {
+        std::function<bool(LazyStorage)> clearFunction = [index](const LazyStorage &a) {
             return a.index < index;
         };
-        storage(clearFunction, storage);
+        storage = Set<LazyStorage>(clearFunction, storage);
     }
     bool IsCalculated(int index) { return storage.contains({index, T()}); }
     T Calculate(int index) {
@@ -154,11 +155,19 @@ template <class T> class LazySequence {
         if (IsInfinite) {
             return Cardinal();
         } else {
-            return Cardinal(rightmost_index - leftmost_index + 1);
+            return Cardinal((size_t)rightmost_index - leftmost_index + 1);
         }
     }
     size_t GetMaterializedCount() const { return storage.GetLength(); }
 
+    int GetLeftmostIndex() const {
+        return leftmost_index;
+    }
+
+    int GetRightmostIndex() const {
+        return rightmost_index;
+    }
+    
     LazySequence<T> *Append(T item) const {
         LazySequence<T> *newSeq = new LazySequence<T>(*this);
         ++(newSeq->rightmost_index);
@@ -173,7 +182,9 @@ template <class T> class LazySequence {
     }
     LazySequence<T> *InsertAt(T item, int index) const {
         LazySequence<T> *newSeq = new LazySequence<T>(*this);
-        newSeq->_clearStorage(index);
+        if (rule != nullptr)
+            newSeq->_clearStorage(index);
+        newSeq->storage.erase({index, T(0)});
         newSeq->storage.insert({index, item});
         return newSeq;
     }

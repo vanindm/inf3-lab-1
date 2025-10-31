@@ -6,26 +6,37 @@
 
 namespace PATypes {
 template <class A, size_t n> class MultiStripTuringMachine {
-    LazySequence<A> strip[n];
+  protected:
+    LazySequence<A>* strip[n];
     int pointer[n];
     bool accepted = false;
-    void (*d)(MultiStripTuringMachine<A, n> *);
+    virtual void d() = 0;
 
   public:
-    MultiStripTuringMachine(Sequence<LazySequence<A>> *initial,
-                            void (*d)(MultiStripTuringMachine<A, n> *))
-        : d(d) {
+    MultiStripTuringMachine(Sequence<LazySequence<A>> *initial) {
         for (size_t i = 0; i < n; ++i) {
-            LazySequence<A> current = initial->get(i);
-            strip[i] = current;
+            strip[i] = new LazySequence<A>(initial->get(i));
             pointer[i] = 0;
         }
     }
-    void step() { d(this); }
+    ~MultiStripTuringMachine() {
+        for (size_t i = 0; i < n; ++i) {
+            delete strip[i];
+        }
+    }
+    bool step() { 
+        try {
+            d(); 
+            return true;
+        } catch (std::out_of_range &) {
+            return false;
+        }
+    }
+    // deprecated
     bool hasFinished() const {
         for (size_t i = 0; i < n; ++i) {
             try {
-                strip[i].get(pointer[i]);
+                strip[i]->get(pointer[i]);
             } catch (std::out_of_range &err) {
                 return true;
             }
@@ -34,7 +45,7 @@ template <class A, size_t n> class MultiStripTuringMachine {
     }
     LazySequence<A> *getStrip(size_t i) {
         if (i < n) {
-            return new LazySequence<A>(strip[i]);
+            return new LazySequence<A>(*strip[i]);
         } else {
             throw std::logic_error("attempt to return nonexisting strip");
         }

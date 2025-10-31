@@ -15,12 +15,13 @@ template <class T> class Set : public ICollection<T> {
     Set(const Set<T> &set) : tree(set.tree) {}
     // Set(Sequence<T> *sequence) : tree() {
     // }
-    Set(bool (*f)(T), Set<T> &set) { tree = BinaryTree<T>(f, tree); }
+    Set(std::function<bool(T)> f, Set<T> &set) { tree = BinaryTree<T>(f, tree); }
     void insert(T item) { tree.insert(item); }
     void erase(T item) {
         BinaryTreeNode<T> *element = tree.findElement(item);
         if (element) {
             tree.erase(element);
+            return;
         }
         throw std::logic_error(
             "попытка удалить элемент, не лежащий в множестве");

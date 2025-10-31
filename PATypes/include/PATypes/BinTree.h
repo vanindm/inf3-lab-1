@@ -91,7 +91,7 @@ template <class T> class BinaryTree {
                                BinaryTreeNode<T> *parent = nullptr);
     void _erase(BinaryTreeNode<T> **current, BinaryTreeNode<T> *toErase);
     void _insertAll(const BinaryTreeNode<T> *node);
-    void _insertAllWhere(bool (*f)(T), const BinaryTreeNode<T> *node);
+    void _insertAllWhere(std::function<bool(T)> f, const BinaryTreeNode<T> *node);
 
     size_t _size(BinaryTreeNode<T> *current) {
         if (current == nullptr)
@@ -123,7 +123,7 @@ template <class T> class BinaryTree {
     BinaryTree() : root(nullptr), mt(1337) {};
     BinaryTree(const BinaryTree<T> &tree);
     BinaryTree(const BinaryTreeNode<T> &root);
-    BinaryTree(bool (*f)(T), BinaryTree<T> tree);
+    BinaryTree(std::function<bool(T)> f, BinaryTree<T> tree);
     ~BinaryTree() { delete root; }
     void merge(BinaryTree<T> tree);
     BinaryTree<T> *map(T (*f)(T));
@@ -193,7 +193,7 @@ void BinaryTree<T>::_insertAll(const BinaryTreeNode<T> *node) {
 }
 
 template <class T>
-void BinaryTree<T>::_insertAllWhere(bool (*f)(T),
+void BinaryTree<T>::_insertAllWhere(std::function<bool(T)> f,
                                     const BinaryTreeNode<T> *node) {
     if (node != nullptr && f(node->getVal()))
         this->insert(node->getVal());
@@ -217,7 +217,7 @@ BinaryTree<T>::BinaryTree(const BinaryTreeNode<T> &root) : mt(time(nullptr)) {
 }
 
 template <class T>
-BinaryTree<T>::BinaryTree(bool (*f)(T), BinaryTree<T> tree)
+BinaryTree<T>::BinaryTree(std::function<bool(T)> f, BinaryTree<T> tree)
     : mt(time(nullptr)) {
     this->_insertAllWhere(f, tree.root);
 }
@@ -275,6 +275,8 @@ BinaryTree<T>::_split(BinaryTreeNode<T> *first, T key) {
 
 template <class T> void BinaryTree<T>::erase(BinaryTreeNode<T> *node) {
     _erase(&root, node);
+    node->setLeft(nullptr);
+    node->setRight(nullptr);
     delete node;
 }
 
