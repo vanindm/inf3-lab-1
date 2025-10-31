@@ -73,23 +73,23 @@ class VigenereDecryptTuringMachine : public PATypes::MultiStripTuringMachine<cha
 };
 
 int main() {
-    char plaintext[] = "TESTMESSAGE";
-	char key[] = "KEY";
-	char alph[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	char buff[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	std::string plaintext;
+	std::string key;
+	std::string alph;
+	std::cin >> plaintext >> key >> alph;
     PATypes::MutableArraySequence<PATypes::LazySequence<char>> encryptStrips;
-	encryptStrips.append(PATypes::LazySequence<char>(plaintext, 11));
-	encryptStrips.append(PATypes::LazySequence<char>(key, 3));
-	encryptStrips.append(PATypes::LazySequence<char>(alph, 26));
-	encryptStrips.append(PATypes::LazySequence<char>(buff, 26));
+	encryptStrips.append(PATypes::LazySequence<char>(plaintext.c_str(), plaintext.length()));
+	encryptStrips.append(PATypes::LazySequence<char>(key.c_str(), key.length()));
+	encryptStrips.append(PATypes::LazySequence<char>(alph.c_str(), alph.length()));
+	encryptStrips.append(PATypes::LazySequence<char>(alph.c_str(), alph.length()));
     VigenereEncryptTuringMachine encryptMachine(&encryptStrips);
     while (encryptMachine.step()) {
     }
 	PATypes::LazySequence<char> *obtained = encryptMachine.getStrip(0);
 	for (int i = obtained->GetLeftmostIndex(); i <= obtained->GetRightmostIndex(); ++i) {
-		std::cout << obtained->Get(i) << " ";
+		std::cout << obtained->Get(i);
 	}
-	std::cout << "\n";
+	std::cout << std::endl;
 	delete obtained;
 	PATypes::MutableArraySequence<PATypes::LazySequence<char>> decryptStrips;
 	decryptStrips.append(*std::unique_ptr<PATypes::LazySequence<char>>(encryptMachine.getStrip(0)));
@@ -101,8 +101,9 @@ int main() {
     }
 	obtained = decryptMachine.getStrip(0);
 	for (int i = obtained->GetLeftmostIndex(); i <= obtained->GetRightmostIndex(); ++i) {
-		std::cout << obtained->Get(i) << " ";
+		std::cout << obtained->Get(i);
 	}
+	std::cout << std::endl;
 	delete obtained;
     return 0;
 }

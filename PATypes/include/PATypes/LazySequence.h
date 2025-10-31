@@ -105,7 +105,7 @@ template <class T> class LazySequence {
     LazySequence()
         : rule(nullptr), storage(), leftmost_index(0), rightmost_index(0) {}
 
-    LazySequence(T *items, int count)
+    LazySequence(const T *items, int count)
         : rule(nullptr), storage(), leftmost_index(0),
           rightmost_index(count - 1) {
         for (int i = 0; i < count; ++i) {
