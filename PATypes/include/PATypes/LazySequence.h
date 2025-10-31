@@ -63,8 +63,8 @@ template <class T> class LazySequence {
 
     bool IsInfinite = false;
     size_t stride;
-    int rightmost_index;
     int leftmost_index;
+    int rightmost_index;
     void _clearStorage(int index) {
         std::function<bool(T)> clearFunction = [index](const T &a) {
             return a.index < index;
@@ -113,8 +113,8 @@ template <class T> class LazySequence {
     }
 
     LazySequence(Sequence<T> *seq)
-        : rule(nullptr), rightmost_index(seq->getLength() - 1),
-          leftmost_index(0) {
+        : rule(nullptr), leftmost_index(0),
+          rightmost_index(seq->getLength() - 1) {
         auto *enumerator = seq->getEnumerator();
         int i = 0;
         while (enumerator->moveNext()) {
